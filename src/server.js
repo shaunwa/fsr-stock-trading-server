@@ -1,11 +1,16 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { db } from './db';
+import { db, getStockHistory } from './db';
 import { routes } from './routes';
+import { tasks, scheduleTask } from './scheduled-tasks';
 
 const app = express();
 
 app.use(bodyParser.json());
+
+tasks.forEach(task => {
+    scheduleTask(task.handler, task.frequency, app);
+});
 
 routes.forEach(route => {
     app[route.method](route.path, route.handler);
